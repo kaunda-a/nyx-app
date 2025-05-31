@@ -1,12 +1,34 @@
 
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { SearchProvider } from '@/provider/search-context'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import SkipToMain from '@/components/skip-to-main'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import Cookies from 'js-cookie'
+
+// Inline utilities to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// Inline supabase client to avoid import issues during build
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 
 export const Route = createFileRoute('/_authenticated')({
   component: RouteComponent,
