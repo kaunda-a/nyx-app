@@ -233,7 +233,7 @@ Examples:
         else:
             print("\n📋 Next steps:")
             print("1. Test the built applications")
-            print("2. Create distribution: python production/build.py --distribute")
+            print("2. Create distribution: python deploy/build.py --distribute")
     else:
         print("\n" + "=" * 60)
         print("❌ Build failed!")

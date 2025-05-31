@@ -130,8 +130,8 @@ class KeyGenerator:
                 elif 'Password:' in line and i + 1 < len(lines):
                     password = lines[i + 1].strip()
             
-            # Save keys to production config
-            keys_dir = self.paths['production'] / 'config' / 'keys'
+            # Save keys to deploy config
+            keys_dir = self.paths['deploy'] / 'config' / 'keys'
             utils.ensure_directory(keys_dir)
             
             if private_key:
@@ -203,11 +203,11 @@ key_password.txt
         self.logger.info("1. 🔐 Add private key to GitHub Secrets:")
         self.logger.info("   - Go to your repository Settings > Secrets and variables > Actions")
         self.logger.info("   - Add new secret: TAURI_PRIVATE_KEY")
-        self.logger.info("   - Copy content from: production/config/keys/private_key.txt")
+        self.logger.info("   - Copy content from: deploy/config/keys/private_key.txt")
         
         self.logger.info("\n2. 🔑 If you used a password, add it to GitHub Secrets:")
         self.logger.info("   - Add new secret: TAURI_KEY_PASSWORD")
-        self.logger.info("   - Copy content from: production/config/keys/key_password.txt")
+        self.logger.info("   - Copy content from: deploy/config/keys/key_password.txt")
         
         self.logger.info("\n3. ✅ Public key has been automatically added to tauri.conf.json")
         
@@ -221,7 +221,7 @@ key_password.txt
         self.logger.info("🔍 Validating existing keys...")
         
         try:
-            keys_dir = self.paths['production'] / 'config' / 'keys'
+            keys_dir = self.paths['deploy'] / 'config' / 'keys'
             
             # Check if keys exist
             private_key_file = keys_dir / 'private_key.txt'
@@ -281,7 +281,7 @@ def main():
         success = generator.validate_keys()
     else:
         # Check if keys already exist
-        keys_dir = generator.paths['production'] / 'config' / 'keys'
+        keys_dir = generator.paths['deploy'] / 'config' / 'keys'
         private_key_file = keys_dir / 'private_key.txt'
         
         if private_key_file.exists() and not args.force:

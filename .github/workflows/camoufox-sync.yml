@@ -1,0 +1,186 @@
+name: Camoufox Auto-Sync and Build
+
+on:
+  schedule:
+    # Check for Camoufox updates daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Allow manual triggering
+  repository_dispatch:
+    # Allow triggering from external sources
+    types: [camoufox-update]
+
+jobs:
+  check-camoufox-updates:
+    runs-on: windows-latest
+    outputs:
+      has-updates: ${{ steps.check-updates.outputs.has-updates }}
+      latest-version: ${{ steps.check-updates.outputs.latest-version }}
+    
+    steps:
+    - name: Checkout Nyx App
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Check Camoufox updates
+      id: check-updates
+      run: |
+        # Get latest release from original Camoufox repo
+        $originalRepo = "https://api.github.com/repos/daijro/camoufox/releases/latest"
+        $forkRepo = "https://api.github.com/repos/kaunda-a/camoufox/releases/latest"
+        
+        try {
+          $originalRelease = Invoke-RestMethod -Uri $originalRepo
+          $originalVersion = $originalRelease.tag_name
+          
+          try {
+            $forkRelease = Invoke-RestMethod -Uri $forkRepo
+            $forkVersion = $forkRelease.tag_name
+          } catch {
+            $forkVersion = "none"
+          }
+          
+          Write-Host "Original Camoufox version: $originalVersion"
+          Write-Host "Fork version: $forkVersion"
+          
+          if ($originalVersion -ne $forkVersion) {
+            Write-Host "Updates available!"
+            echo "has-updates=true" >> $env:GITHUB_OUTPUT
+            echo "latest-version=$originalVersion" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No updates needed"
+            echo "has-updates=false" >> $env:GITHUB_OUTPUT
+            echo "latest-version=$originalVersion" >> $env:GITHUB_OUTPUT
+          }
+        } catch {
+          Write-Host "Error checking for updates: $_"
+          echo "has-updates=false" >> $env:GITHUB_OUTPUT
+        }
+
+  sync-camoufox-fork:
+    needs: check-camoufox-updates
+    if: needs.check-camoufox-updates.outputs.has-updates == 'true'
+    runs-on: windows-latest
+    
+    steps:
+    - name: Sync Camoufox fork
+      run: |
+        Write-Host "🔄 Syncing Camoufox fork with latest version: ${{ needs.check-camoufox-updates.outputs.latest-version }}"
+        
+        # This step would typically use GitHub's sync fork API
+        # For now, we'll trigger a manual sync notification
+        Write-Host "Fork sync would be triggered here"
+        
+        # In a real implementation, you would:
+        # 1. Use GitHub API to sync the fork
+        # 2. Or use git commands to pull and push updates
+        # 3. Handle any merge conflicts if they arise
+
+  build-with-updated-camoufox:
+    needs: [check-camoufox-updates, sync-camoufox-fork]
+    if: needs.check-camoufox-updates.outputs.has-updates == 'true'
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout Nyx App
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+    
+    - name: Download updated Camoufox
+      run: |
+        python deploy/deploy.py --update-camoufox
+    
+    - name: Build Nyx with updated Camoufox
+      run: |
+        python deploy/build.py --target all --test --distribute
+    
+    - name: Create release with updated Camoufox
+      if: success()
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: auto-camoufox-${{ needs.check-camoufox-updates.outputs.latest-version }}
+        release_name: Auto-build with Camoufox ${{ needs.check-camoufox-updates.outputs.latest-version }}
+        body: |
+          🤖 **Automated Build with Updated Camoufox**
+          
+          This release was automatically generated when Camoufox was updated to version `${{ needs.check-camoufox-updates.outputs.latest-version }}`.
+          
+          **What's Updated:**
+          - 🦊 Camoufox updated to latest version
+          - 🔧 Nyx App rebuilt with updated browser
+          - ✅ All tests passed
+          - 📦 Complete distribution package ready
+          
+          **Download:**
+          - `Nyx.msi` - Complete installer with latest Camoufox
+          - `nyx-server.exe` - Standalone server executable
+          
+          **Installation:**
+          1. Download `Nyx.msi`
+          2. Run installer
+          3. Launch Nyx from Start Menu
+          
+          ---
+          *This is an automated release. If you encounter any issues, please report them in the main repository.*
+        draft: false
+        prerelease: false
+    
+    - name: Upload Nyx.msi to release
+      if: success()
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/Nyx.msi
+        asset_name: Nyx.msi
+        asset_content_type: application/octet-stream
+    
+    - name: Upload server executable to release
+      if: success()
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/nyx-server.exe
+        asset_name: nyx-server.exe
+        asset_content_type: application/octet-stream
+
+  notify-completion:
+    needs: [check-camoufox-updates, build-with-updated-camoufox]
+    if: always()
+    runs-on: windows-latest
+    
+    steps:
+    - name: Notify completion
+      run: |
+        if ("${{ needs.check-camoufox-updates.outputs.has-updates }}" -eq "true") {
+          if ("${{ needs.build-with-updated-camoufox.result }}" -eq "success") {
+            Write-Host "✅ Successfully built Nyx with updated Camoufox ${{ needs.check-camoufox-updates.outputs.latest-version }}"
+          } else {
+            Write-Host "❌ Failed to build Nyx with updated Camoufox"
+          }
+        } else {
+          Write-Host "ℹ️  No Camoufox updates available"
+        }

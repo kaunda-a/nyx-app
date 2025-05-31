@@ -47,7 +47,7 @@
     }
   },
   "client": {
-    "package_manager": "pnpm",
+    "package_manager": "npm",
     "node_version": "18",
     "build": {
       "enabled": true,
@@ -75,7 +75,7 @@
     },
     "signing": {
       "enabled": true,
-      "key_storage": "production/config/keys",
+      "key_storage": "deploy/config/keys",
       "github_secrets": {
         "private_key": "TAURI_PRIVATE_KEY",
         "password": "TAURI_KEY_PASSWORD"

@@ -121,6 +121,10 @@ jobs:
       run: |
         # Windows dependencies are handled by package managers
 
+    - name: Download and bundle Camoufox
+      run: |
+        python deploy/deploy.py --bundle-camoufox
+
     - name: Setup server environment
       run: |
         python deploy/scripts/server/setup.py --mode production
@@ -136,6 +140,10 @@ jobs:
     - name: Build Tauri app
       run: |
         python deploy/scripts/client/build.py --target tauri --test --package
+
+    - name: Create complete distribution package
+      run: |
+        python deploy/build.py --target all --distribute
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3

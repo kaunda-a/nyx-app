@@ -238,7 +238,7 @@ class ProductionUtils:
             'root': base_path,
             'server': base_path / 'server',
             'client': base_path / 'client',
-            'production': base_path / 'production',
+            'deploy': base_path / 'deploy',
             'dist': base_path / 'dist'
         }
 
