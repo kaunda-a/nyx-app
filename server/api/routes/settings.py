@@ -37,7 +37,7 @@ router = APIRouter(prefix="/settings")
 class AccountCreate(BaseModel):
     """Account creation model."""
     username: str = Field(..., min_length=3, max_length=50)
-    email: str = Field(..., regex=r'^[^@]+@[^@]+\.[^@]+$')
+    email: str = Field(..., pattern=r'^[^@]+@[^@]+\.[^@]+$')
     password: str = Field(..., min_length=8)
 
 
@@ -68,7 +68,7 @@ class TwoFactorVerify(BaseModel):
 class AccountDelete(BaseModel):
     """Account deletion model."""
     password: str = Field(...)
-    confirmation: str = Field(..., regex=r'^DELETE$')
+    confirmation: str = Field(..., pattern=r'^DELETE$')
 
 
 class BackupRestore(BaseModel):
