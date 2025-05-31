@@ -8,8 +8,23 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { useAuthStore } from '@/auth/api/stores/authStore'
-import { handleServerError } from '@/lib/handle-server-error'
 import { toast } from '@/hooks/use-toast'
+
+// Inline error handler to avoid import issues during build
+function handleServerError(error: unknown) {
+  console.log(error)
+  let errMsg = 'Something went wrong!'
+
+  if (error && typeof error === 'object' && 'status' in error && Number(error.status) === 204) {
+    errMsg = 'Content not found.'
+  }
+
+  if (error instanceof AxiosError) {
+    errMsg = error.response?.data.title
+  }
+
+  toast({ variant: 'destructive', title: errMsg })
+}
 import { FontProvider } from './provider/font-context'
 import { ThemeProvider } from './provider/theme-context'
 import { LoadingProvider } from './provider/loading-context'
