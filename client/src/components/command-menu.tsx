@@ -3,7 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { IconArrowRightDashed, IconSun, IconMoon, IconDeviceLaptop } from '@tabler/icons-react'
 import { useTheme } from '@/provider/theme-context'
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,6 +16,11 @@ import {
 } from './ui/command'
 import { ScrollArea } from './ui/scroll-area'
 import { create } from 'zustand'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import type { User } from '@supabase/supabase-js'
 import { getSidebarData } from './layout/data/sidebar-data'
 import type { NavGroup, NavItem, SidebarData } from './layout/types'

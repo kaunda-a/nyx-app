@@ -6,8 +6,14 @@ import { useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { useAuth } from '@/auth/api/stores/authStore'
 import { toast } from '@/hooks/use-toast'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { Button } from '@/components/ui/button'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import {
   Form,
   FormControl,
