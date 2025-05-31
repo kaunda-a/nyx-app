@@ -1,5 +1,20 @@
-import { supabase } from '@/lib/supabase';
-import { User, EmailOtpType } from '@supabase/supabase-js';
+import { createClient, User, EmailOtpType } from '@supabase/supabase-js';
+
+// Inline supabase client to avoid import issues during build
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
 /**
  * Types for authentication API
