@@ -18,7 +18,18 @@ export default defineConfig({
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG,
     rollupOptions: {
-      external: [],
+      external: [
+        '@tauri-apps/api/app',
+        '@tauri-apps/api/core',
+        '@tauri-apps/api/event',
+        '@tauri-apps/api/path',
+        '@tauri-apps/api/process',
+        '@tauri-apps/api/shell',
+        '@tauri-apps/api/updater',
+        '@tauri-apps/api/window',
+        '@tauri-apps/plugin-shell',
+        '@tauri-apps/plugin-updater',
+      ],
     },
   },
   plugins: [react(), TanStackRouterVite()],
