@@ -1,5 +1,11 @@
-import { cn } from "@/lib/utils"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { ButtonProps, Button } from "./button"
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import { useState, useEffect } from "react"
 
 interface AdvancedButtonProps extends ButtonProps {

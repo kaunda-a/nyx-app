@@ -1,5 +1,11 @@
-import { cn } from "@/lib/utils"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { Card, CardProps } from "./card"
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface GradientCardProps extends CardProps {
   glowOnHover?: boolean
