@@ -35,10 +35,10 @@ jobs:
       run: |
         cd server
         cp .env.example .env
-        # Set test values
-        sed -i 's/your_supabase_url_here/https://test.supabase.co/' .env
-        sed -i 's/your_supabase_key_here/test_key/' .env
-        sed -i 's/your_jwt_secret_here/test_jwt_secret_at_least_32_characters_long/' .env
+        # Set test values using proper sed syntax
+        sed -i 's|your_supabase_url_here|https://test.supabase.co|g' .env
+        sed -i 's|your_supabase_key_here|test_key|g' .env
+        sed -i 's|your_jwt_secret_here|test_jwt_secret_at_least_32_characters_long|g' .env
 
     - name: Test server startup
       run: |
@@ -127,7 +127,14 @@ jobs:
 
     - name: Setup server environment
       run: |
-        python deploy/scripts/server/setup.py --mode production
+        # Create production .env file with secrets
+        cd server
+        cp .env.example .env
+        # Replace with actual production values from secrets
+        sed -i "s|your_supabase_url_here|${{ secrets.SUPABASE_URL }}|g" .env
+        sed -i "s|your_supabase_key_here|${{ secrets.SUPABASE_KEY }}|g" .env
+        sed -i "s|your_jwt_secret_here|${{ secrets.JWT_SECRET }}|g" .env
+        python ../deploy/scripts/server/setup.py --mode production
 
     - name: Build server executable
       run: |
@@ -135,6 +142,15 @@ jobs:
 
     - name: Setup client environment
       run: |
+        # Create client .env file with secrets
+        cd client
+        echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" > .env
+        echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
+        echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+        echo "VITE_WS_URL=${{ secrets.VITE_WS_URL }}" >> .env
+        # Install dependencies
+        pnpm install
+        cd ..
         python deploy/scripts/client/setup.py --check-rust
 
     - name: Build Tauri app
