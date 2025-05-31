@@ -1,6 +1,12 @@
 import * as React from 'react'
 import * as SwitchPrimitives from '@radix-ui/react-switch'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
