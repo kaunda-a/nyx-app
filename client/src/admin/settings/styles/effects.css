@@ -1,0 +1,178 @@
+/* Nyx UI Effects - Advanced UI effects for Nyx undetectable browser */
+
+/* Text shadow utilities */
+.text-shadow-sm {
+  text-shadow: 0 0 2px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.1));
+}
+
+.text-shadow-md {
+  text-shadow: 
+    0 0 4px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.2)),
+    0 0 8px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.1));
+}
+
+.text-shadow-lg {
+  text-shadow: 
+    0 0 6px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.3)),
+    0 0 12px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.2)),
+    0 0 18px var(--tw-text-shadow-color, rgba(0, 0, 0, 0.1));
+}
+
+/* Gradient animations */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 8s ease infinite;
+}
+
+/* Glass morphism effects */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-effect-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Neumorphism effects */
+.neumorphic-light {
+  background: #f0f0f3;
+  box-shadow: 
+    10px 10px 20px #d1d1d1,
+    -10px -10px 20px #ffffff;
+}
+
+.neumorphic-dark {
+  background: #1a1a1a;
+  box-shadow: 
+    10px 10px 20px #0a0a0a,
+    -10px -10px 20px #2a2a2a;
+}
+
+.neumorphic-inset-light {
+  background: #f0f0f3;
+  box-shadow: 
+    inset 5px 5px 10px #d1d1d1,
+    inset -5px -5px 10px #ffffff;
+}
+
+.neumorphic-inset-dark {
+  background: #1a1a1a;
+  box-shadow: 
+    inset 5px 5px 10px #0a0a0a,
+    inset -5px -5px 10px #2a2a2a;
+}
+
+/* Moving border animation */
+@keyframes border-move {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.moving-border {
+  position: relative;
+  border-radius: 0.75rem;
+  z-index: 0;
+}
+
+.moving-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  padding: 2px;
+  background: linear-gradient(
+    to right,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f43f5e,
+    #f59e0b,
+    #10b981,
+    #3b82f6
+  );
+  background-size: 200% 200%;
+  animation: border-move 8s linear infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Neon glow effects */
+.neon-blue {
+  color: #3b82f6;
+  text-shadow:
+    0 0 5px #3b82f6,
+    0 0 10px #3b82f6,
+    0 0 20px #3b82f6,
+    0 0 40px #3b82f6;
+}
+
+.neon-purple {
+  color: #8b5cf6;
+  text-shadow:
+    0 0 5px #8b5cf6,
+    0 0 10px #8b5cf6,
+    0 0 20px #8b5cf6,
+    0 0 40px #8b5cf6;
+}
+
+.neon-pink {
+  color: #ec4899;
+  text-shadow:
+    0 0 5px #ec4899,
+    0 0 10px #ec4899,
+    0 0 20px #ec4899,
+    0 0 40px #ec4899;
+}
+
+.neon-green {
+  color: #10b981;
+  text-shadow:
+    0 0 5px #10b981,
+    0 0 10px #10b981,
+    0 0 20px #10b981,
+    0 0 40px #10b981;
+}
+
+/* 3D card effect */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}

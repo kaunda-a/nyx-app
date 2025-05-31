@@ -1,0 +1,13 @@
+# Tauri signing keys - DO NOT COMMIT TO VERSION CONTROL
+private_key.txt
+key_password.txt
+
+# Only public key can be committed (if needed)
+!public_key.txt
+!.gitignore
+
+# Additional security files
+*.pem
+*.key
+*.p12
+*.pfx

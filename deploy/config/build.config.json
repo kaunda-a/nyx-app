@@ -1,0 +1,111 @@
+{
+  "project": {
+    "name": "nyx-app",
+    "version": "1.0.0",
+    "description": "Nyx Admin Application"
+  },
+  "paths": {
+    "root": "..",
+    "server": "../server",
+    "client": "../client",
+    "output": "../dist"
+  },
+  "server": {
+    "python_version": "3.11",
+    "venv_name": "base",
+    "requirements_file": "requirements.txt",
+    "main_file": "main.py",
+    "build": {
+      "enabled": true,
+      "tool": "pyinstaller",
+      "options": {
+        "onefile": true,
+        "console": true,
+        "name": "nyx-server",
+        "add_data": [
+          "api:api",
+          "core:core",
+          "db:db",
+          "sessions:sessions"
+        ],
+        "hidden_imports": [
+          "uvicorn.lifespan.on",
+          "uvicorn.lifespan.off",
+          "uvicorn.protocols.websockets.auto",
+          "uvicorn.protocols.http.auto",
+          "fastapi",
+          "starlette",
+          "pydantic",
+          "supabase"
+        ]
+      }
+    },
+    "health_check": {
+      "url": "http://localhost:8080/health",
+      "timeout": 30,
+      "retry_interval": 2
+    }
+  },
+  "client": {
+    "package_manager": "pnpm",
+    "node_version": "18",
+    "build": {
+      "enabled": true,
+      "command": "tauri build",
+      "env_file": ".env.production"
+    },
+    "dev": {
+      "command": "dev",
+      "port": 5173
+    }
+  },
+  "deployment": {
+    "local": {
+      "create_installer": true,
+      "include_server": true,
+      "startup_scripts": true,
+      "bundle_camoufox": true
+    },
+    "github": {
+      "workflow_file": ".github/workflows/build-and-test.yml",
+      "artifact_retention": 30,
+      "platforms": ["windows-latest"],
+      "camoufox_fork": "kaunda-a/camoufox",
+      "auto_sync": true
+    },
+    "signing": {
+      "enabled": true,
+      "key_storage": "production/config/keys",
+      "github_secrets": {
+        "private_key": "TAURI_PRIVATE_KEY",
+        "password": "TAURI_KEY_PASSWORD"
+      }
+    },
+    "camoufox": {
+      "source": "https://github.com/kaunda-a/camoufox",
+      "branch": "main",
+      "bundle_path": "dist/camoufox",
+      "executable_name": "camoufox.exe",
+      "auto_update": true,
+      "apply_branding": true
+    }
+  },
+  "environment": {
+    "development": {
+      "server_port": 8080,
+      "client_port": 5173,
+      "log_level": "INFO"
+    },
+    "production": {
+      "server_port": 8080,
+      "log_level": "WARNING",
+      "optimize": true
+    }
+  },
+  "features": {
+    "auto_start_server": true,
+    "health_monitoring": true,
+    "error_recovery": true,
+    "logging": true
+  }
+}

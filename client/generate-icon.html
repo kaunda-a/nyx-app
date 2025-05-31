@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Nyx Icon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        canvas {
+            border: 1px solid #333;
+            margin: 10px;
+            background: white;
+        }
+        .dark-canvas {
+            background: #1a1a1a;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nyx Icon Generator</h1>
+    <p>This will generate PNG icons for your Tauri app.</p>
+    
+    <div>
+        <h3>Light Theme Icons:</h3>
+        <canvas id="canvas32" width="32" height="32"></canvas>
+        <canvas id="canvas128" width="128" height="128"></canvas>
+        <canvas id="canvas256" width="256" height="256"></canvas>
+        <canvas id="canvas512" width="512" height="512"></canvas>
+    </div>
+    
+    <div>
+        <h3>Dark Theme Icons:</h3>
+        <canvas id="canvasDark32" width="32" height="32" class="dark-canvas"></canvas>
+        <canvas id="canvasDark128" width="128" height="128" class="dark-canvas"></canvas>
+        <canvas id="canvasDark256" width="256" height="256" class="dark-canvas"></canvas>
+        <canvas id="canvasDark512" width="512" height="512" class="dark-canvas"></canvas>
+    </div>
+    
+    <div>
+        <button onclick="generateIcons()">Generate Icons</button>
+        <button onclick="downloadAll()">Download All</button>
+    </div>
+
+    <script>
+        function drawSpiderIcon(ctx, size, isDark = false) {
+            const scale = size / 24;
+            const strokeColor = isDark ? '#ffffff' : '#000000';
+            const fillColor = isDark ? '#ffffff' : '#000000';
+            
+            ctx.clearRect(0, 0, size, size);
+            ctx.strokeStyle = strokeColor;
+            ctx.fillStyle = fillColor;
+            ctx.lineWidth = 1.5 * scale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Main body - hexagon
+            ctx.beginPath();
+            ctx.moveTo(12 * scale, 4 * scale);
+            ctx.lineTo(18 * scale, 8 * scale);
+            ctx.lineTo(18 * scale, 16 * scale);
+            ctx.lineTo(12 * scale, 20 * scale);
+            ctx.lineTo(6 * scale, 16 * scale);
+            ctx.lineTo(6 * scale, 8 * scale);
+            ctx.closePath();
+            ctx.stroke();
+            
+            // Left legs
+            ctx.beginPath();
+            ctx.moveTo(6 * scale, 12 * scale);
+            ctx.lineTo(3 * scale, 9 * scale);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(6 * scale, 12 * scale);
+            ctx.lineTo(2 * scale, 12 * scale);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(6 * scale, 12 * scale);
+            ctx.lineTo(3 * scale, 15 * scale);
+            ctx.stroke();
+            
+            // Right legs
+            ctx.beginPath();
+            ctx.moveTo(18 * scale, 12 * scale);
+            ctx.lineTo(21 * scale, 9 * scale);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(18 * scale, 12 * scale);
+            ctx.lineTo(22 * scale, 12 * scale);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(18 * scale, 12 * scale);
+            ctx.lineTo(21 * scale, 15 * scale);
+            ctx.stroke();
+            
+            // Eyes
+            ctx.beginPath();
+            ctx.arc(10 * scale, 12 * scale, 1 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(14 * scale, 12 * scale, 1 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        
+        function generateIcons() {
+            const sizes = [32, 128, 256, 512];
+            
+            sizes.forEach(size => {
+                // Light theme
+                const canvas = document.getElementById(`canvas${size}`);
+                const ctx = canvas.getContext('2d');
+                drawSpiderIcon(ctx, size, false);
+                
+                // Dark theme
+                const canvasDark = document.getElementById(`canvasDark${size}`);
+                const ctxDark = canvasDark.getContext('2d');
+                drawSpiderIcon(ctxDark, size, true);
+            });
+        }
+        
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function downloadAll() {
+            const sizes = [32, 128, 256, 512];
+            
+            sizes.forEach(size => {
+                const canvas = document.getElementById(`canvas${size}`);
+                const canvasDark = document.getElementById(`canvasDark${size}`);
+                
+                downloadCanvas(canvas, `icon-${size}x${size}.png`);
+                downloadCanvas(canvasDark, `icon-${size}x${size}-dark.png`);
+            });
+        }
+        
+        // Generate icons on page load
+        window.onload = generateIcons;
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+name: Build and Test Nyx App
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-server:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Create virtual environment
+      run: |
+        cd server
+        python -m venv base
+        source base/bin/activate
+        python -m pip install --upgrade pip
+
+    - name: Install dependencies
+      run: |
+        cd server
+        source base/bin/activate
+        pip install -r requirements.txt
+
+    - name: Create test environment file
+      run: |
+        cd server
+        cp .env.example .env
+        # Set test values
+        sed -i 's/your_supabase_url_here/https://test.supabase.co/' .env
+        sed -i 's/your_supabase_key_here/test_key/' .env
+        sed -i 's/your_jwt_secret_here/test_jwt_secret_at_least_32_characters_long/' .env
+
+    - name: Test server startup
+      run: |
+        cd server
+        source base/bin/activate
+        timeout 30s python main.py || true
+        # Check if server started successfully (exit code 124 means timeout, which is expected)
+        if [ $? -eq 124 ]; then
+          echo "Server started successfully and was terminated by timeout"
+        else
+          echo "Server failed to start"
+          exit 1
+        fi
+
+  test-client:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Install dependencies
+      run: |
+        cd client
+        pnpm install
+
+    - name: Build client
+      run: |
+        cd client
+        pnpm build
+
+    - name: Test client build
+      run: |
+        cd client
+        # Check if build artifacts exist
+        if [ -d "dist" ]; then
+          echo "Client build successful"
+        else
+          echo "Client build failed"
+          exit 1
+        fi
+
+  build-production:
+    runs-on: windows-latest
+
+    needs: [test-server, test-client]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install Windows dependencies
+      run: |
+        # Windows dependencies are handled by package managers
+
+    - name: Setup server environment
+      run: |
+        python deploy/scripts/server/setup.py --mode production
+
+    - name: Build server executable
+      run: |
+        python deploy/scripts/server/build.py --test --package
+
+    - name: Setup client environment
+      run: |
+        python deploy/scripts/client/setup.py --check-rust
+
+    - name: Build Tauri app
+      run: |
+        python deploy/scripts/client/build.py --target tauri --test --package
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: nyx-app-windows
+        path: |
+          server/dist/
+          client/src-tauri/target/release/bundle/
+          dist/
+        retention-days: 30
