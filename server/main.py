@@ -5,6 +5,10 @@ import signal
 import sys
 import uvicorn
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import FastAPI app
 from api.fastapi import app as fastapi_app

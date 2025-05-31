@@ -22,7 +22,8 @@ from pydantic import BaseModel, Field, validator
 from db.settings_operations import settings_operations
 
 # Import authentication
-from api.auth import get_current_user, User
+from api.middleware.auth import get_current_user
+from security.auth import User
 
 # Configure logger
 logger = logging.getLogger("camoufox.api.settings")
