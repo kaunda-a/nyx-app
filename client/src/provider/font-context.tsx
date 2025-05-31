@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { fonts } from '@/lib/fonts'
+
+// Define fonts directly to avoid import issues during build
+const fonts = ['inter', 'manrope', 'system'] as const
 
 type Font = (typeof fonts)[number]
 
