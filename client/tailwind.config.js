@@ -1,6 +1,8 @@
 import tailwindCssAnimate from 'tailwindcss-animate'
 import defaultTheme from 'tailwindcss/defaultTheme'
-import { fonts } from './src/lib/fonts'
+
+// Define fonts directly to avoid import issues during build
+const fonts = ['inter', 'manrope', 'system']
 
 /** @type {import('tailwindcss').Config} */
 export default {
