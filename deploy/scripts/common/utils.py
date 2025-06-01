@@ -70,12 +70,12 @@ class ProductionUtils:
             if env:
                 run_env.update(env)
 
-            # Run command
+            # Run command - use shell=True on Windows for better compatibility
             result = subprocess.run(
                 command,
                 cwd=cwd,
                 env=run_env,
-                shell=True if isinstance(command, str) else False,
+                shell=True,  # Always use shell=True on Windows for better compatibility
                 capture_output=capture_output,
                 text=True,
                 timeout=timeout,
