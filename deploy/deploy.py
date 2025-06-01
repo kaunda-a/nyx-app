@@ -99,7 +99,7 @@ def setup_github_deployment():
         else:
             utils.logger.warning("   ⚠️  Workflow file not found")
 
-        utils.logger.info("\n🚀 After setting up secrets, push to trigger the workflow!")
+        utils.logger.info("\n>> After setting up secrets, push to trigger the workflow!")
 
         return True
 
@@ -387,7 +387,7 @@ Examples:
 
     # Print banner
     print("=" * 60)
-    print("🚀 Nyx App Deployment Orchestrator")
+    print(">> Nyx App Deployment Orchestrator")
     print("=" * 60)
 
     success = True
