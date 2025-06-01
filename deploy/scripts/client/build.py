@@ -64,8 +64,8 @@ class ClientBuilder:
 VITE_WS_URL=ws://localhost:8081
 ''')
 
-            # Build Tauri app
-            utils.run_command([package_manager, build_command], cwd=str(client_path))
+            # Build Tauri app - use the npm script defined in package.json
+            utils.run_command([package_manager, 'run', 'tauri:build'], cwd=str(client_path))
 
             # Verify build output
             bundle_dir = client_path / 'src-tauri' / 'target' / 'release' / 'bundle'
