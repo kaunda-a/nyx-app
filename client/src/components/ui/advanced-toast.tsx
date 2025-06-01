@@ -1,6 +1,12 @@
 import { Toast, ToastProps } from "./toast"
-import { cn } from "@/lib/utils"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { IconCheck, IconX, IconInfoCircle, IconAlertTriangle } from "@tabler/icons-react"
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface AdvancedToastProps extends ToastProps {
   variant?: "success" | "error" | "info" | "warning"
