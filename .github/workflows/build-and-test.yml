@@ -149,7 +149,7 @@ jobs:
         # Debug: Check if secrets are available
         echo "=== DEBUG: Checking secrets availability ==="
         echo "SUPABASE_URL length: ${#SUPABASE_URL}"
-        echo "SUPABASE_KEY length: ${#SUPABASE_KEY}"
+        echo "SUPABASE_SERVICE_ROLE_KEY length: ${#SUPABASE_SERVICE_ROLE_KEY}"
         echo "JWT_SECRET length: ${#JWT_SECRET}"
         echo "============================================="
         # Replace with actual production values from secrets using correct placeholders
@@ -161,7 +161,7 @@ jobs:
             content = f.read()
         # Replace placeholders with environment variables
         content = content.replace('https://your-project.supabase.co', os.environ.get('SUPABASE_URL', 'https://placeholder.supabase.co'))
-        content = content.replace('your_supabase_anon_key_here', os.environ.get('SUPABASE_KEY', 'placeholder_key'))
+        content = content.replace('your_supabase_anon_key_here', os.environ.get('SUPABASE_SERVICE_ROLE_KEY', 'placeholder_key'))
         content = content.replace('your_very_secure_jwt_secret_here_at_least_32_characters', os.environ.get('JWT_SECRET', 'placeholder_jwt_secret_32_chars_long'))
         # Write back to .env file
         with open('.env', 'w') as f:
@@ -175,7 +175,7 @@ jobs:
         python ../deploy/scripts/server/setup.py --mode production
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     - name: Build server executable

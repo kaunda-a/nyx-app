@@ -83,12 +83,12 @@ exe = EXE(
         with open(spec_file, 'w') as f:
             f.write(spec_content)
 
-        self.logger.info(f"📝 Created PyInstaller spec file: {spec_file}")
+        self.logger.info(f">> Created PyInstaller spec file: {spec_file}")
         return spec_file
 
     def build_executable(self) -> bool:
         """Build standalone executable"""
-        self.logger.info("🔨 Building server executable...")
+        self.logger.info(">> Building server executable...")
 
         try:
             server_path = self.paths['server']
