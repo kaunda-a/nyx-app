@@ -1,6 +1,12 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { SkeletonLoader } from '@/admin/settings/components/ui/skeleton-loader';
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface SettingsLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   sidebar?: React.ReactNode;

@@ -1,5 +1,11 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface MainProps extends React.HTMLAttributes<HTMLElement> {
   fixed?: boolean

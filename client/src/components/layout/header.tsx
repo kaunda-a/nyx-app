@@ -1,6 +1,12 @@
 import React from 'react'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { Separator } from '@/components/ui/separator'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import { SidebarTrigger } from '@/components/ui/sidebar'
 
 interface HeaderProps extends React.HTMLAttributes<HTMLElement> {
