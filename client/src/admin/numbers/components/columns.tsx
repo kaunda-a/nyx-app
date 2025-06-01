@@ -4,7 +4,15 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/tables/data-table-column-header'
 import { DataTableRowActions } from '@/components/tables/data-table-row-actions'
 import { NumberDetails } from '../types'
-import { formatPhoneNumber } from '@/lib/utils'
+// Inline formatPhoneNumber function to avoid import issues during build
+function formatPhoneNumber(phoneNumber: string): string {
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  }
+  return phoneNumber;
+}
 
 export const columns: ColumnDef<NumberDetails>[] = [
   {

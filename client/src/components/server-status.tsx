@@ -18,9 +18,87 @@ import {
   XCircle, 
   AlertTriangle 
 } from 'lucide-react';
-import { checkServerHealth, waitForServer, type ServerStatus } from '@/lib/server-health';
 import { toast } from '@/hooks/use-toast';
-import { isTauriApp } from '@/lib/config';
+
+// Inline server health and config functions to avoid import issues during build
+const isTauriApp = (): boolean => {
+  return typeof window !== 'undefined' && '__TAURI__' in window;
+};
+
+const getApiUrl = (): string => {
+  const runtimeApiUrl = window.localStorage.getItem('RUNTIME_API_URL');
+  if (runtimeApiUrl) return runtimeApiUrl;
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  return 'http://localhost:8080';
+};
+
+interface ServerStatus {
+  isRunning: boolean;
+  responseTime?: number;
+  error?: string;
+  lastChecked: Date;
+}
+
+const checkServerHealth = async (timeout = 5000): Promise<ServerStatus> => {
+  const startTime = Date.now();
+  const apiUrl = getApiUrl();
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const response = await fetch(`${apiUrl}/health`, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    clearTimeout(timeoutId);
+    const responseTime = Date.now() - startTime;
+
+    if (response.ok) {
+      return { isRunning: true, responseTime, lastChecked: new Date() };
+    } else {
+      return {
+        isRunning: false,
+        error: `Server responded with status ${response.status}`,
+        lastChecked: new Date()
+      };
+    }
+  } catch (error) {
+    const responseTime = Date.now() - startTime;
+    return {
+      isRunning: false,
+      responseTime,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      lastChecked: new Date()
+    };
+  }
+};
+
+const waitForServer = async (
+  maxAttempts = 30,
+  intervalMs = 1000,
+  onProgress?: (attempt: number, status: ServerStatus) => void
+): Promise<boolean> => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const status = await checkServerHealth();
+
+    if (onProgress) {
+      onProgress(attempt, status);
+    }
+
+    if (status.isRunning) {
+      return true;
+    }
+
+    if (attempt < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, intervalMs));
+    }
+  }
+
+  return false;
+};
 
 export function ServerStatusComponent() {
   const [serverStatus, setServerStatus] = useState<ServerStatus | null>(null);

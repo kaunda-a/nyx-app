@@ -3,7 +3,80 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { IconRefresh, IconCamera, IconDeviceMobile } from '@tabler/icons-react'
-import { useWebSocket, MessageType, ConnectionStatus } from '@/lib/websocket-service'
+// Inline WebSocket service to avoid import issues during build
+enum MessageType {
+  PHONE_SCREEN = 'phone_screen',
+  PHONE_CONTROL = 'phone_control',
+}
+
+enum ConnectionStatus {
+  CONNECTING = 'connecting',
+  CONNECTED = 'connected',
+  DISCONNECTED = 'disconnected',
+  ERROR = 'error',
+}
+
+interface WebSocketOptions {
+  reconnectInterval?: number;
+  maxReconnectAttempts?: number;
+  pingInterval?: number;
+  debug?: boolean;
+}
+
+const useWebSocket = (url: string, options: WebSocketOptions = {}) => {
+  const [status, setStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
+  const wsRef = useRef<WebSocket | null>(null);
+  const listenersRef = useRef<Map<string, Function[]>>(new Map());
+
+  const connect = (token?: string) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) return;
+
+    setStatus(ConnectionStatus.CONNECTING);
+    const wsUrl = token ? `${url}?token=${token}` : url;
+    wsRef.current = new WebSocket(wsUrl);
+
+    wsRef.current.onopen = () => setStatus(ConnectionStatus.CONNECTED);
+    wsRef.current.onclose = () => setStatus(ConnectionStatus.DISCONNECTED);
+    wsRef.current.onerror = () => setStatus(ConnectionStatus.ERROR);
+    wsRef.current.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        const listeners = listenersRef.current.get(message.type) || [];
+        listeners.forEach(listener => listener(message));
+      } catch (e) {
+        console.error('WebSocket message parse error:', e);
+      }
+    };
+  };
+
+  const disconnect = () => {
+    wsRef.current?.close();
+    setStatus(ConnectionStatus.DISCONNECTED);
+  };
+
+  const send = (message: any) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+    }
+  };
+
+  const on = (type: string, listener: Function) => {
+    const listeners = listenersRef.current.get(type) || [];
+    listeners.push(listener);
+    listenersRef.current.set(type, listeners);
+  };
+
+  const off = (type: string, listener: Function) => {
+    const listeners = listenersRef.current.get(type) || [];
+    const index = listeners.indexOf(listener);
+    if (index > -1) {
+      listeners.splice(index, 1);
+      listenersRef.current.set(type, listeners);
+    }
+  };
+
+  return { status, connect, disconnect, send, on, off };
+};
 import { useToast } from '@/hooks/use-toast'
 import { usePhone } from '../context/phone-context'
 
