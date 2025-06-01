@@ -35,10 +35,10 @@ jobs:
       run: |
         cd server
         cp .env.example .env
-        # Set test values using proper sed syntax
-        sed -i 's|your_supabase_url_here|https://test.supabase.co|g' .env
-        sed -i 's|your_supabase_key_here|test_key|g' .env
-        sed -i 's|your_jwt_secret_here|test_jwt_secret_at_least_32_characters_long|g' .env
+        # Set test values using proper sed syntax - use same values as production secrets for consistency
+        sed -i 's|your_supabase_url_here|https://placeholder.supabase.co|g' .env
+        sed -i 's|your_supabase_key_here|placeholder_service_role_key_for_testing_purposes_only|g' .env
+        sed -i 's|your_jwt_secret_here|test_jwt_secret_at_least_32_characters_long_for_github_build_testing|g' .env
 
     - name: Test server startup
       run: |
