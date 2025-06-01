@@ -1,6 +1,23 @@
 import React, { createContext, useContext, useState, useCallback } from 'react'
 import { useToast } from '@/hooks/use-toast'
-import { handleServerError } from '@/lib/handle-server-error'
+import { AxiosError } from 'axios'
+import { toast } from '@/hooks/use-toast'
+
+// Inline error handler to avoid import issues during build
+function handleServerError(error: unknown) {
+  console.log(error)
+  let errMsg = 'Something went wrong!'
+
+  if (error && typeof error === 'object' && 'status' in error && Number(error.status) === 204) {
+    errMsg = 'Content not found.'
+  }
+
+  if (error instanceof AxiosError) {
+    errMsg = error.response?.data.title
+  }
+
+  toast({ variant: 'destructive', title: errMsg })
+}
 import { phonesApi } from '../api/phones-api'
 import {
   VirtualDevice,
