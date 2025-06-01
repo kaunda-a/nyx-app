@@ -39,6 +39,10 @@ jobs:
         sed -i 's|https://your-project.supabase.co|https://placeholder.supabase.co|g' .env
         sed -i 's|your_supabase_anon_key_here|placeholder_service_role_key_for_testing_purposes_only|g' .env
         sed -i 's|your_very_secure_jwt_secret_here_at_least_32_characters|test_jwt_secret_at_least_32_characters_long_for_github_build_testing|g' .env
+        # Debug: Show what was actually set
+        echo "=== DEBUG: .env file contents ==="
+        cat .env
+        echo "================================="
 
     - name: Test server startup
       run: |
@@ -96,6 +100,7 @@ jobs:
 
   build-production:
     runs-on: windows-latest
+    environment: production
 
     needs: [test-server, test-client]
     if: github.ref == 'refs/heads/main'
@@ -134,11 +139,25 @@ jobs:
         # Create production .env file with secrets
         cd server
         cp .env.example .env
+        # Debug: Check if secrets are available
+        echo "=== DEBUG: Checking secrets availability ==="
+        echo "SUPABASE_URL length: ${#SUPABASE_URL}"
+        echo "SUPABASE_KEY length: ${#SUPABASE_KEY}"
+        echo "JWT_SECRET length: ${#JWT_SECRET}"
+        echo "============================================="
         # Replace with actual production values from secrets using correct placeholders
         sed -i "s|https://your-project.supabase.co|${{ secrets.SUPABASE_URL }}|g" .env
         sed -i "s|your_supabase_anon_key_here|${{ secrets.SUPABASE_KEY }}|g" .env
         sed -i "s|your_very_secure_jwt_secret_here_at_least_32_characters|${{ secrets.JWT_SECRET }}|g" .env
+        # Debug: Show what was actually set (mask sensitive values)
+        echo "=== DEBUG: .env file contents (masked) ==="
+        sed 's/=.*/=***MASKED***/' .env
+        echo "==========================================="
         python ../deploy/scripts/server/setup.py --mode production
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     - name: Build server executable
       run: |
@@ -146,12 +165,16 @@ jobs:
 
     - name: Setup client environment
       run: |
-        # Create client .env file with secrets
+        # Create client .env file with environment secrets
         cd client
         echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" > .env
         echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
         echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
         echo "VITE_WS_URL=${{ secrets.VITE_WS_URL }}" >> .env
+        # Debug: Show client env (masked)
+        echo "=== DEBUG: Client .env contents (masked) ==="
+        sed 's/=.*/=***MASKED***/' .env
+        echo "============================================="
         # Install dependencies
         pnpm install
         cd ..
