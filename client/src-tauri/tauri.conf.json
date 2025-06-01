@@ -44,9 +44,9 @@
     "shortDescription": "Nyx Admin Desktop Application",
     "longDescription": "A powerful admin interface for managing Nyx services and data.",
     "windows": {
-      "certificateThumbprint": "",
+      "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": "http://timestamp.sectigo.com",
+      "timestampUrl": "",
       "wix": {
         "language": "en-US",
         "template": "main.wxs"
