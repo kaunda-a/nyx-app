@@ -148,9 +148,14 @@ jobs:
         cp .env.example .env
         # Debug: Check if secrets are available
         echo "=== DEBUG: Checking secrets availability ==="
-        echo "SUPABASE_URL length: ${#SUPABASE_URL}"
-        echo "SUPABASE_SERVICE_ROLE_KEY length: ${#SUPABASE_SERVICE_ROLE_KEY}"
-        echo "JWT_SECRET length: ${#JWT_SECRET}"
+        echo "Environment: ${{ github.environment }}"
+        echo "SUPABASE_URL: ${SUPABASE_URL:0:10}... (length: ${#SUPABASE_URL})"
+        echo "SUPABASE_KEY: ${SUPABASE_KEY:0:10}... (length: ${#SUPABASE_KEY})"
+        echo "JWT_SECRET: ${JWT_SECRET:0:10}... (length: ${#JWT_SECRET})"
+        echo "VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:0:10}... (length: ${#VITE_SUPABASE_URL})"
+        echo "VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:0:10}... (length: ${#VITE_SUPABASE_ANON_KEY})"
+        echo "VITE_API_URL: ${VITE_API_URL:0:10}... (length: ${#VITE_API_URL})"
+        echo "VITE_WS_URL: ${VITE_WS_URL:0:10}... (length: ${#VITE_WS_URL})"
         echo "============================================="
         # Replace with actual production values from secrets using correct placeholders
         # Use a more robust approach to avoid sed issues with special characters
@@ -161,7 +166,7 @@ jobs:
             content = f.read()
         # Replace placeholders with environment variables
         content = content.replace('https://your-project.supabase.co', os.environ.get('SUPABASE_URL', 'https://placeholder.supabase.co'))
-        content = content.replace('your_supabase_anon_key_here', os.environ.get('SUPABASE_SERVICE_ROLE_KEY', 'placeholder_key'))
+        content = content.replace('your_supabase_anon_key_here', os.environ.get('SUPABASE_KEY', 'placeholder_key'))
         content = content.replace('your_very_secure_jwt_secret_here_at_least_32_characters', os.environ.get('JWT_SECRET', 'placeholder_jwt_secret_32_chars_long'))
         # Write back to .env file
         with open('.env', 'w') as f:
@@ -175,8 +180,12 @@ jobs:
         python ../deploy/scripts/server/setup.py --mode production
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
 
     - name: Build server executable
       run: |
