@@ -1,4 +1,45 @@
-import { api } from '@/lib/api';
+import axios from 'axios';
+import { createClient } from '@supabase/supabase-js';
+
+// Inline API client to avoid import issues during build
+const getApiUrl = (): string => {
+  const runtimeApiUrl = window.localStorage.getItem('RUNTIME_API_URL');
+  if (runtimeApiUrl) return runtimeApiUrl;
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  return 'http://localhost:8080';
+};
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
+});
+
+const api = axios.create({
+  baseURL: getApiUrl(),
+  headers: { 'Content-Type': 'application/json' }
+});
+
+api.interceptors.request.use(async (config) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response?.status === 401) supabase.auth.signOut();
+    return Promise.reject(error);
+  }
+);
 
 // Types
 export interface ProxyCreate {
