@@ -1,8 +1,14 @@
 import { useState, type JSX } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { buttonVariants } from '@/components/ui/button'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Select,
