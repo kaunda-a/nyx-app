@@ -35,10 +35,10 @@ jobs:
       run: |
         cd server
         cp .env.example .env
-        # Set test values using proper sed syntax - use same values as production secrets for consistency
-        sed -i 's|your_supabase_url_here|https://placeholder.supabase.co|g' .env
-        sed -i 's|your_supabase_key_here|placeholder_service_role_key_for_testing_purposes_only|g' .env
-        sed -i 's|your_jwt_secret_here|test_jwt_secret_at_least_32_characters_long_for_github_build_testing|g' .env
+        # Set test values using correct placeholders from .env.example
+        sed -i 's|https://your-project.supabase.co|https://placeholder.supabase.co|g' .env
+        sed -i 's|your_supabase_anon_key_here|placeholder_service_role_key_for_testing_purposes_only|g' .env
+        sed -i 's|your_very_secure_jwt_secret_here_at_least_32_characters|test_jwt_secret_at_least_32_characters_long_for_github_build_testing|g' .env
 
     - name: Test server startup
       run: |
@@ -130,10 +130,10 @@ jobs:
         # Create production .env file with secrets
         cd server
         cp .env.example .env
-        # Replace with actual production values from secrets
-        sed -i "s|your_supabase_url_here|${{ secrets.SUPABASE_URL }}|g" .env
-        sed -i "s|your_supabase_key_here|${{ secrets.SUPABASE_KEY }}|g" .env
-        sed -i "s|your_jwt_secret_here|${{ secrets.JWT_SECRET }}|g" .env
+        # Replace with actual production values from secrets using correct placeholders
+        sed -i "s|https://your-project.supabase.co|${{ secrets.SUPABASE_URL }}|g" .env
+        sed -i "s|your_supabase_anon_key_here|${{ secrets.SUPABASE_KEY }}|g" .env
+        sed -i "s|your_very_secure_jwt_secret_here_at_least_32_characters|${{ secrets.JWT_SECRET }}|g" .env
         python ../deploy/scripts/server/setup.py --mode production
 
     - name: Build server executable
