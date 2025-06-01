@@ -1,5 +1,11 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 import { GlassCard } from '@/admin/settings/components/ui/glass-card';
 import { GradientBorder } from '@/admin/settings/components/ui/gradient-border';
 import { NeonText } from '@/admin/settings/components/ui/neon-text';
