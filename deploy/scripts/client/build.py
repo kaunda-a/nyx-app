@@ -67,22 +67,14 @@ VITE_WS_URL=ws://localhost:8081
             # Build Tauri app - use the npm script defined in package.json
             utils.run_command([package_manager, 'run', 'tauri:build'], cwd=str(client_path))
 
-            # Verify build output
-            bundle_dir = client_path / 'src-tauri' / 'target' / 'release' / 'bundle'
-            if not bundle_dir.exists():
-                raise FileNotFoundError("Tauri build output not found")
+            # Verify build output - check for executable instead of bundle
+            exe_path = client_path / 'src-tauri' / 'target' / 'release' / 'app.exe'
+            if not exe_path.exists():
+                raise FileNotFoundError("Tauri executable not found")
 
-            # Find built Windows installers
-            installers = []
-            for pattern in ['**/*.msi', '**/*.exe']:
-                installers.extend(glob.glob(str(bundle_dir / pattern), recursive=True))
-
-            if not installers:
-                raise FileNotFoundError("No installers found in build output")
-
-            for installer in installers:
-                size_mb = Path(installer).stat().st_size / (1024 * 1024)
-                self.logger.info(f"📦 Built installer: {installer} ({size_mb:.1f} MB)")
+            # Report the built executable
+            size_mb = exe_path.stat().st_size / (1024 * 1024)
+            self.logger.info(f"📦 Built executable: {exe_path} ({size_mb:.1f} MB)")
 
             self.logger.info("✅ Tauri application built successfully")
             return True
