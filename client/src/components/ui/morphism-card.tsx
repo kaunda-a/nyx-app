@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface MorphismCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'glass' | 'neumorphic' | 'soft' | 'flat';
