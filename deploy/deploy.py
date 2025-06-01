@@ -158,13 +158,17 @@ def prepare_local_deployment():
 
 def download_and_bundle_camoufox():
     """Download and bundle Camoufox from forked repository"""
-    utils.logger.info("🦊 Downloading Camoufox from forked repository...")
+    utils.logger.info(">> Downloading Camoufox from forked repository...")
 
     try:
         # Import Camoufox bundler
-        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "deploy"))
-        import camoufox_bundler
-        camoufox_bundler = camoufox_bundler.camoufox_bundler
+        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "download"))
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("camoufox_bundler",
+                                                     Path(__file__).parent / "scripts" / "download" / "camoufox-bundler.py")
+        camoufox_bundler_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(camoufox_bundler_module)
+        camoufox_bundler = camoufox_bundler_module.camoufox_bundler
 
         # Download and prepare Camoufox
         import asyncio
@@ -183,7 +187,7 @@ def download_and_bundle_camoufox():
         return success
 
     except Exception as e:
-        utils.logger.error(f"❌ Camoufox bundling failed: {e}")
+        utils.logger.error(f"ERROR: Camoufox bundling failed: {e}")
         return False
 
 def update_camoufox():
@@ -192,7 +196,7 @@ def update_camoufox():
 
     try:
         # Import Camoufox bundler
-        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "deploy"))
+        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "download"))
         import camoufox_bundler
         camoufox_bundler = camoufox_bundler.camoufox_bundler
 
@@ -217,7 +221,7 @@ def show_camoufox_info():
 
     try:
         # Import Camoufox bundler
-        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "deploy"))
+        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "download"))
         import camoufox_bundler
         camoufox_bundler = camoufox_bundler.camoufox_bundler
 
@@ -419,7 +423,7 @@ Examples:
         print("=" * 60)
     elif not success:
         print("\n" + "=" * 60)
-        print("❌ Deployment preparation failed!")
+        print("ERROR: Deployment preparation failed!")
         print("=" * 60)
 
     sys.exit(0 if success else 1)
