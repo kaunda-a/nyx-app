@@ -65,13 +65,5 @@
         "depends": []
       }
     }
-  },
-  "updater": {
-    "active": true,
-    "endpoints": [
-      "https://your-domain.com/api/updates/{{target}}/{{current_version}}"
-    ],
-    "dialog": true,
-    "pubkey": ""
   }
 }
