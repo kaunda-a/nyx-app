@@ -4,9 +4,17 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Download, RefreshCw, CheckCircle, AlertCircle, Settings } from 'lucide-react'
-import { updateManager, UpdateInfo } from '@/lib/updater'
+import { check, install } from '@tauri-apps/plugin-updater'
+import { relaunch } from '@tauri-apps/plugin-process'
 import { getVersion } from '@tauri-apps/api/app'
 import { toast } from '@/hooks/use-toast'
+
+// Inline UpdateInfo interface to avoid import issues during build
+interface UpdateInfo {
+  version: string;
+  date: string;
+  body: string;
+}
 
 export function UpdateForm() {
   const [currentVersion, setCurrentVersion] = useState<string>('')
@@ -38,8 +46,32 @@ export function UpdateForm() {
   const handleCheckForUpdates = async () => {
     setIsChecking(true)
     try {
-      const update = await updateManager.checkForUpdates(true)
-      setUpdateInfo(update)
+      toast({
+        title: 'Checking for updates...'
+      })
+
+      const update = await check()
+
+      if (update?.available) {
+        const updateInfo: UpdateInfo = {
+          version: update.version || 'Unknown',
+          date: update.date || new Date().toISOString(),
+          body: update.body || 'No release notes available'
+        }
+
+        toast({
+          title: `Update available: v${updateInfo.version}`,
+          description: 'Click to install the update'
+        })
+
+        setUpdateInfo(updateInfo)
+      } else {
+        toast({
+          title: 'You are running the latest version'
+        })
+        setUpdateInfo(null)
+      }
+
       setLastChecked(new Date())
       localStorage.setItem('lastUpdateCheck', new Date().toISOString())
     } catch (error) {
@@ -55,8 +87,46 @@ export function UpdateForm() {
   }
 
   const handleInstallUpdate = async () => {
-    if (updateInfo) {
-      await updateManager.installUpdate()
+    if (!updateInfo) {
+      toast({
+        variant: 'destructive',
+        title: 'No update available'
+      })
+      return
+    }
+
+    try {
+      toast({
+        title: 'Installing update...',
+        description: 'Please wait while the update is downloaded and installed'
+      })
+
+      await install()
+
+      toast({
+        title: 'Update installed successfully',
+        description: 'The application will restart now'
+      })
+
+      // Auto-restart after 3 seconds
+      setTimeout(async () => {
+        try {
+          await relaunch()
+        } catch (error) {
+          console.error('Error restarting app:', error)
+          toast({
+            variant: 'destructive',
+            title: 'Failed to restart application'
+          })
+        }
+      }, 3000)
+
+    } catch (error) {
+      console.error('Error installing update:', error)
+      toast({
+        variant: 'destructive',
+        title: 'Failed to install update'
+      })
     }
   }
 
