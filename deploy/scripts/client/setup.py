@@ -147,7 +147,7 @@ VITE_WS_URL=ws://localhost:8081
             package_manager = self.config.get('package_manager', 'pnpm')
             
             result = utils.run_command(
-                [package_manager, 'tauri', '--version'],
+                [package_manager, 'exec', 'tauri', '--version'],
                 cwd=str(client_path),
                 capture_output=True
             )
