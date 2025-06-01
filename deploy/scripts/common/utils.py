@@ -199,15 +199,20 @@ class ProductionUtils:
         # Get Windows pip executable path
         pip_cmd = str(venv_path / "Scripts" / "pip.exe")
 
-        # Upgrade pip first
-        self.run_command([pip_cmd, "install", "--upgrade", "pip"])
+        # Upgrade pip first (use python -m pip to avoid Windows issues)
+        python_cmd = str(venv_path / "Scripts" / "python.exe")
+        try:
+            self.run_command([python_cmd, "-m", "pip", "install", "--upgrade", "pip"])
+        except Exception as e:
+            self.logger.warning(f"Pip upgrade failed (continuing anyway): {e}")
+            # Continue without upgrading pip - it's not critical
 
         # Install requirements
         self.run_command([pip_cmd, "install", "-r", str(requirements_file)])
 
     def validate_environment(self) -> bool:
         """Validate the environment for production builds"""
-        self.logger.info("🔍 Validating environment...")
+        self.logger.info(">> Validating environment...")
 
         # Check Python version
         python_version = sys.version_info
@@ -227,7 +232,7 @@ class ProductionUtils:
             self.logger.error(f"Missing required tools: {', '.join(missing)}")
             return False
 
-        self.logger.info("✅ Environment validation passed")
+        self.logger.info("SUCCESS: Environment validation passed")
         return True
 
     def get_project_paths(self) -> Dict[str, Path]:
@@ -266,7 +271,7 @@ class ProductionUtils:
         with open(output_path, 'w') as f:
             f.write(content)
 
-        self.logger.info(f"📝 Created environment file: {output_path}")
+        self.logger.info(f">> Created environment file: {output_path}")
 
 # Global utility instance
 utils = ProductionUtils()

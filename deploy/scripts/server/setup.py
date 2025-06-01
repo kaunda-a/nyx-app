@@ -57,7 +57,7 @@ class ServerSetup:
 
     def setup_production(self) -> bool:
         """Setup server for production"""
-        self.logger.info("🚀 Setting up server for production...")
+        self.logger.info(">> Setting up server for production...")
 
         try:
             # Ensure development setup is done first
@@ -74,11 +74,11 @@ class ServerSetup:
             # Install PyInstaller for building executables
             utils.run_command([pip_cmd, "install", "pyinstaller"])
 
-            self.logger.info("✅ Server production setup completed")
+            self.logger.info("SUCCESS: Server production setup completed")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Server production setup failed: {e}")
+            self.logger.error(f"ERROR: Server production setup failed: {e}")
             return False
 
     def validate_setup(self) -> bool:
@@ -129,7 +129,7 @@ class ServerSetup:
 
     def start_development_server(self) -> bool:
         """Start development server"""
-        self.logger.info("🚀 Starting development server...")
+        self.logger.info(">> Starting development server...")
 
         try:
             if not self.validate_setup():
