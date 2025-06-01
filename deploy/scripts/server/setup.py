@@ -19,7 +19,7 @@ class ServerSetup:
 
     def setup_development(self) -> bool:
         """Setup server for development"""
-        self.logger.info("🚀 Setting up server for development...")
+        self.logger.info(">> Setting up server for development...")
 
         try:
             # Change to server directory
@@ -83,7 +83,7 @@ class ServerSetup:
 
     def validate_setup(self) -> bool:
         """Validate server setup"""
-        self.logger.info("🔍 Validating server setup...")
+        self.logger.info(">> Validating server setup...")
 
         try:
             server_path = self.paths['server']
@@ -92,13 +92,13 @@ class ServerSetup:
 
             # Check virtual environment
             if not venv_path.exists():
-                self.logger.error("❌ Virtual environment not found")
+                self.logger.error("ERROR: Virtual environment not found")
                 return False
 
             # Check main file
             main_file = server_path / self.config.get('main_file', 'main.py')
             if not main_file.exists():
-                self.logger.error(f"❌ Main file not found: {main_file}")
+                self.logger.error(f"ERROR: Main file not found: {main_file}")
                 return False
 
             # Check environment file
@@ -117,14 +117,14 @@ class ServerSetup:
             )
 
             if "OK" not in test_result.stdout:
-                self.logger.error("❌ Required packages not properly installed")
+                self.logger.error("ERROR: Required packages not properly installed")
                 return False
 
-            self.logger.info("✅ Server setup validation passed")
+            self.logger.info("SUCCESS: Server setup validation passed")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Server validation failed: {e}")
+            self.logger.error(f"ERROR: Server validation failed: {e}")
             return False
 
     def start_development_server(self) -> bool:
