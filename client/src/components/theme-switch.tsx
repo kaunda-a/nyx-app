@@ -1,7 +1,13 @@
 import { useEffect } from 'react'
 import { IconMoon, IconSun } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import { useTheme } from '@/provider/theme-context'
 
 export function ThemeSwitch() {
