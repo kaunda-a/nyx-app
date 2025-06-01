@@ -202,9 +202,27 @@ exe = EXE(
             utils.copy_file(src_exe, dst_exe)
 
             # Copy environment template
-            env_template = self.paths['production'] / 'config' / 'server.env.template'
+            env_template = self.paths['server'] / '.env.example'
             dst_env = output_dir / '.env.example'
-            utils.copy_file(env_template, dst_env)
+            if env_template.exists():
+                utils.copy_file(env_template, dst_env)
+            else:
+                # Create a basic .env.example if template doesn't exist
+                with open(dst_env, 'w') as f:
+                    f.write('''# Nyx Server Configuration
+# Copy this file to .env and fill in your actual values
+
+# Server Configuration
+PORT=8080
+ENVIRONMENT=production
+
+# Database Configuration (Supabase)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your_supabase_anon_key_here
+
+# Security
+JWT_SECRET=your_very_secure_jwt_secret_here_at_least_32_characters
+''')
 
             # Create Windows startup script
             startup_script = output_dir / 'start-server.bat'
