@@ -44,12 +44,16 @@ jobs:
       run: |
         cd server
         source base/bin/activate
-        timeout 30s python main.py || true
+        # Run server with timeout and capture exit code
+        timeout 30s python main.py
+        exit_code=$?
         # Check if server started successfully (exit code 124 means timeout, which is expected)
-        if [ $? -eq 124 ]; then
-          echo "Server started successfully and was terminated by timeout"
+        if [ $exit_code -eq 124 ]; then
+          echo "✅ Server started successfully and was terminated by timeout"
+        elif [ $exit_code -eq 0 ]; then
+          echo "✅ Server started and stopped gracefully"
         else
-          echo "Server failed to start"
+          echo "❌ Server failed to start (exit code: $exit_code)"
           exit 1
         fi
 
