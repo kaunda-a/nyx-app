@@ -1,5 +1,11 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 import { NeonText } from '@/admin/settings/components/ui/neon-text';
 import { SkeletonLoader } from '@/admin/settings/components/ui/skeleton-loader';
 import { styles } from '@/admin/settings/styles';
