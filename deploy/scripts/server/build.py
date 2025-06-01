@@ -155,17 +155,19 @@ exe = EXE(
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE)
 
-            # Wait a few seconds
-            time.sleep(5)
+            # Wait a shorter time for faster testing
+            time.sleep(3)
 
             # Check if process is still running
             if process.poll() is None:
                 self.logger.info("✅ Executable started successfully")
                 process.terminate()
                 try:
-                    process.wait(timeout=10)
+                    process.wait(timeout=5)
                 except subprocess.TimeoutExpired:
+                    self.logger.warning("Process didn't terminate gracefully, killing...")
                     process.kill()
+                    process.wait()
                 return True
             else:
                 stdout, stderr = process.communicate()
