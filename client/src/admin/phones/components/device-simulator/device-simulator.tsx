@@ -32,7 +32,13 @@ import {
 } from '@tabler/icons-react';
 import { PhoneDevice } from '../device-models/phone-device';
 import { VirtualDevice } from '../../data/schema';
-import { cn } from '@/lib/utils';
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 interface DeviceSimulatorProps {
   device: VirtualDevice;
