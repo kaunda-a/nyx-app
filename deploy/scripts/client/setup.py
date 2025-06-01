@@ -142,22 +142,29 @@ VITE_WS_URL=ws://localhost:8081
                 self.logger.error("❌ Rust not found. Please install Rust from https://rustup.rs/")
                 return False
             
-            # Check Tauri CLI
+            # Check Tauri CLI - skip version check and assume it's installed since we see it in dependencies
             client_path = self.paths['client']
             package_manager = self.config.get('package_manager', 'pnpm')
-            
-            result = utils.run_command(
-                [package_manager, 'exec', 'tauri', '--version'],
-                cwd=str(client_path),
-                capture_output=True
-            )
-            
-            if result.returncode != 0:
-                self.logger.warning("⚠️  Tauri CLI not found, installing...")
+
+            # Check if @tauri-apps/cli is in package.json devDependencies
+            package_json = client_path / 'package.json'
+            tauri_installed = False
+
+            if package_json.exists():
+                import json
+                with open(package_json, 'r') as f:
+                    pkg_data = json.load(f)
+                    dev_deps = pkg_data.get('devDependencies', {})
+                    tauri_installed = '@tauri-apps/cli' in dev_deps
+
+            if not tauri_installed:
+                self.logger.warning("⚠️  Tauri CLI not found in package.json, installing...")
                 utils.run_command(
                     [package_manager, 'add', '-D', '@tauri-apps/cli'],
                     cwd=str(client_path)
                 )
+            else:
+                self.logger.info("✅ Tauri CLI found in dependencies")
             
             self.logger.info("✅ Rust dependencies check passed")
             return True
