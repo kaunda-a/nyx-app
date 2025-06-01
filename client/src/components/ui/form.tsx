@@ -9,7 +9,13 @@ import {
 } from 'react-hook-form'
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
-import { cn } from '@/lib/utils'
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+// Inline cn function to avoid import issues during build
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 import { Label } from '@/components/ui/label'
 
 const Form = FormProvider
