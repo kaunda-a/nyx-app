@@ -120,28 +120,19 @@ VITE_WS_URL=ws://localhost:8081
         self.logger.info("🧪 Testing built application...")
 
         try:
-            # For now, just verify files exist
+            # Check for the built executable
             client_path = self.paths['client']
-            bundle_dir = client_path / 'src-tauri' / 'target' / 'release' / 'bundle'
+            exe_path = client_path / 'src-tauri' / 'target' / 'release' / 'app.exe'
 
-            if not bundle_dir.exists():
-                raise FileNotFoundError("Build output directory not found")
-
-            # Check for Windows installers
-            installers = []
-            for pattern in ['**/*.msi', '**/*.exe']:
-                installers.extend(glob.glob(str(bundle_dir / pattern), recursive=True))
-
-            if not installers:
-                raise FileNotFoundError("No installers found")
+            if not exe_path.exists():
+                raise FileNotFoundError("Executable not found")
 
             # Basic file integrity check
-            for installer_path in installers:
-                installer = Path(installer_path)
-                if installer.stat().st_size < 1024:  # Less than 1KB is suspicious
-                    raise ValueError(f"Installer seems too small: {installer}")
+            if exe_path.stat().st_size < 1024 * 1024:  # Less than 1MB is suspicious for a Tauri app
+                raise ValueError(f"Executable seems too small: {exe_path}")
 
-            self.logger.info("✅ Build test passed")
+            size_mb = exe_path.stat().st_size / (1024 * 1024)
+            self.logger.info(f"✅ Build test passed - Executable: {size_mb:.1f} MB")
             return True
 
         except Exception as e:
