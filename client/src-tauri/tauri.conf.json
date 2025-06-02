@@ -30,8 +30,8 @@
     }
   },
   "bundle": {
-    "active": false,
-    "targets": [],
+    "active": true,
+    "targets": ["nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -43,6 +43,9 @@
     "category": "Productivity",
     "shortDescription": "Nyx Admin Desktop Application",
     "longDescription": "A powerful admin interface for managing Nyx services and data.",
+    "resources": [
+      "../../server/dist/nyx-server.exe"
+    ],
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",

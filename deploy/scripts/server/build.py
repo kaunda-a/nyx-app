@@ -194,53 +194,23 @@ exe = EXE(
             # Ensure output directory exists
             utils.ensure_directory(output_dir)
 
-            # Copy executable
+            # Server executable will be embedded in desktop app - no separate copy needed
             exe_name = utils.get_platform_executable_name(self.build_config.get('name', 'nyx-server'))
             src_exe = dist_dir / exe_name
-            dst_exe = output_dir / exe_name
 
-            utils.copy_file(src_exe, dst_exe)
-
-            # Copy environment template
-            env_template = self.paths['server'] / '.env.example'
-            dst_env = output_dir / '.env.example'
-            if env_template.exists():
-                utils.copy_file(env_template, dst_env)
+            if src_exe.exists():
+                size_mb = src_exe.stat().st_size / (1024 * 1024)
+                self.logger.info(f">> Server executable ready for embedding: {src_exe} ({size_mb:.1f} MB)")
             else:
-                # Create a basic .env.example if template doesn't exist
-                with open(dst_env, 'w') as f:
-                    f.write('''# Nyx Server Configuration
-# Copy this file to .env and fill in your actual values
+                self.logger.error("Server executable not found for embedding")
 
-# Server Configuration
-PORT=8080
-ENVIRONMENT=production
+            # No additional files needed - server is embedded in desktop app
 
-# Database Configuration (Supabase)
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your_supabase_anon_key_here
-
-# Security
-JWT_SECRET=your_very_secure_jwt_secret_here_at_least_32_characters
-''')
-
-            # Create Windows startup script
-            startup_script = output_dir / 'start-server.bat'
-            with open(startup_script, 'w') as f:
-                f.write(f'''@echo off
-echo Starting Nyx Server...
-echo Server will be available at http://localhost:8080
-echo Press Ctrl+C to stop the server
-echo.
-{exe_name}
-pause
-''')
-
-            self.logger.info(f"📦 Server packaged in: {output_dir}")
+            self.logger.info(f">> Server ready for embedding: {output_dir}")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Packaging failed: {e}")
+            self.logger.error(f"ERROR: Packaging failed: {e}")
             return False
 
 def main():

@@ -63,13 +63,46 @@ async fn open_server_folder() -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+async fn start_embedded_server(app_handle: tauri::AppHandle) -> Result<(), String> {
+    log::info!("Starting embedded server...");
+
+    // Get the resource path for the server executable
+    let resource_path = app_handle
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("Failed to get resource directory: {}", e))?
+        .join("nyx-server.exe");
+
+    if !resource_path.exists() {
+        return Err("Server executable not found in resources".to_string());
+    }
+
+    // Start the server process
+    match Command::new(&resource_path)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
+        Ok(_) => {
+            log::info!("Server started successfully");
+            Ok(())
+        }
+        Err(e) => {
+            log::error!("Failed to start server: {}", e);
+            Err(format!("Failed to start server: {}", e))
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
         check_server_health,
         start_server,
-        open_server_folder
+        open_server_folder,
+        start_embedded_server
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {
@@ -90,10 +123,17 @@ pub fn run() {
           match check_server_health().await {
               Ok(true) => log::info!("Server is already running"),
               Ok(false) => {
-                  log::info!("Server not running, attempting to start...");
-                  match start_server().await {
-                      Ok(msg) => log::info!("{}", msg),
-                      Err(e) => log::warn!("Failed to auto-start server: {}", e),
+                  log::info!("Server not running, starting embedded server...");
+                  match start_embedded_server(app_handle.clone()).await {
+                      Ok(_) => log::info!("Embedded server started successfully"),
+                      Err(e) => {
+                          log::warn!("Failed to start embedded server: {}", e);
+                          // Fallback to external server start
+                          match start_server().await {
+                              Ok(msg) => log::info!("Fallback server start: {}", msg),
+                              Err(e2) => log::error!("All server start methods failed: {}", e2),
+                          }
+                      }
                   }
               },
               Err(e) => log::error!("Error checking server health: {}", e),

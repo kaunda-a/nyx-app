@@ -83,37 +83,41 @@ def create_distribution_package():
         utils.ensure_directory(output_dir)
 
         # Create README for distribution
-        readme_content = """# Nyx App Distribution Package
+        readme_content = """# Nyx App - Complete Standalone Application
 
-This package contains the complete Nyx App for production deployment.
+This package contains the complete Nyx App as a single standalone executable.
 
 ## Contents
 
-- `nyx-server.exe` - Backend server
-- `Nyx.msi` - Desktop application installer
-- `start-server.bat` - Server startup script
-- `.env.example` - Environment configuration template
+- `nyx.exe` - Complete Nyx application with embedded server (~135 MB)
+- `README.txt` - This file
 
-## Installation
+## Quick Start
 
-1. **Install the desktop application**:
-   - Run `Nyx.msi` installer
+1. **Run the application**:
+   - Double-click `nyx.exe`
+   - The app will automatically start the embedded server
+   - Desktop interface will open and connect to the local server
 
-2. **Configure the server**:
-   - Copy `.env.example` to `.env`
-   - Edit `.env` with your configuration values
+## Features
 
-3. **Start the server**:
-   - Run `start-server.bat`
+- **Standalone Installation** - No additional software required
+- **Embedded Server** - Backend server runs automatically
+- **Desktop Interface** - Modern React-based UI
+- **Auto-Configuration** - Works out of the box
 
-4. **Launch the desktop app**:
-   - The app will automatically connect to the local server
+## Technical Details
+
+- Server runs on http://localhost:8080 (internal)
+- Desktop app automatically manages server lifecycle
+- All dependencies bundled in single executable
+- No manual server setup required
 
 ## Requirements
 
-- No additional software required
-- Server runs on port 8080 by default
-- Ensure port 8080 is not blocked by firewall
+- Windows 10 or later
+- No additional software installation needed
+- Ensure port 8080 is not blocked by firewall (for internal communication)
 
 ## Support
 

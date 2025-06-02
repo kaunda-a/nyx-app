@@ -221,7 +221,5 @@ jobs:
       with:
         name: nyx-app-windows
         path: |
-          server/dist/
-          client/src-tauri/target/release/bundle/
           dist/
         retention-days: 30

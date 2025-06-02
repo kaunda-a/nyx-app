@@ -85,7 +85,7 @@ VITE_WS_URL=ws://localhost:8081
 
     def package_for_distribution(self) -> bool:
         """Package client for distribution"""
-        self.logger.info("📦 Packaging client for distribution...")
+        self.logger.info(">> Packaging client for distribution...")
 
         try:
             client_path = self.paths['client']
@@ -94,25 +94,34 @@ VITE_WS_URL=ws://localhost:8081
             # Ensure output directory exists
             utils.ensure_directory(output_dir)
 
-            # Copy installers
-            bundle_dir = client_path / 'src-tauri' / 'target' / 'release' / 'bundle'
+            # Copy the built installer (NSIS creates a single executable installer)
+            bundle_dir = client_path / 'src-tauri' / 'target' / 'release' / 'bundle' / 'nsis'
+            if bundle_dir.exists():
+                # Find the NSIS installer
+                for installer_path in bundle_dir.glob('*.exe'):
+                    dst_path = output_dir / 'nyx.exe'
+                    utils.copy_file(installer_path, dst_path)
+                    size_mb = installer_path.stat().st_size / (1024 * 1024)
+                    self.logger.info(f">> Copied standalone app: {dst_path} ({size_mb:.1f} MB)")
+                    break
+                else:
+                    self.logger.warning("NSIS installer not found")
+            else:
+                # Fallback to raw executable if bundling failed
+                exe_path = client_path / 'src-tauri' / 'target' / 'release' / 'app.exe'
+                if exe_path.exists():
+                    dst_path = output_dir / 'nyx.exe'
+                    utils.copy_file(exe_path, dst_path)
+                    size_mb = exe_path.stat().st_size / (1024 * 1024)
+                    self.logger.info(f">> Copied desktop app: {dst_path} ({size_mb:.1f} MB)")
+                else:
+                    self.logger.warning("Desktop app executable not found")
 
-            # Find and copy Windows installers
-            for pattern in ['**/*.msi', '**/*.exe']:
-                for installer_path in glob.glob(str(bundle_dir / pattern), recursive=True):
-                    installer = Path(installer_path)
-                    # Rename to simple Nyx.msi if it's an MSI installer
-                    if installer.suffix.lower() == '.msi':
-                        dst_path = output_dir / 'Nyx.msi'
-                    else:
-                        dst_path = output_dir / installer.name
-                    utils.copy_file(installer, dst_path)
-
-            self.logger.info(f"📦 Client packaged in: {output_dir}")
+            self.logger.info(f">> Client packaged in: {output_dir}")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Client packaging failed: {e}")
+            self.logger.error(f"ERROR: Client packaging failed: {e}")
             return False
 
     def test_build(self) -> bool:
