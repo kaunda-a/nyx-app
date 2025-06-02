@@ -67,7 +67,7 @@ def build_client(target: str = 'all', test: bool = False, package: bool = False)
 
 def create_distribution_package():
     """Create complete distribution package"""
-    utils.logger.info("📦 Creating distribution package...")
+    utils.logger.info(">> Creating distribution package...")
 
     try:
         output_dir = utils.get_project_paths()['dist']
@@ -115,10 +115,10 @@ For issues or questions, please refer to the documentation or contact support.
         with open(readme_path, 'w') as f:
             f.write(readme_content)
 
-        utils.logger.info(f"📦 Distribution package created in: {output_dir}")
+        utils.logger.info(f">> Distribution package created in: {output_dir}")
 
         # List contents
-        utils.logger.info("📋 Package contents:")
+        utils.logger.info(">> Package contents:")
         for item in output_dir.iterdir():
             if item.is_file():
                 size_mb = item.stat().st_size / (1024 * 1024)
@@ -127,12 +127,12 @@ For issues or questions, please refer to the documentation or contact support.
         return True
 
     except Exception as e:
-        utils.logger.error(f"❌ Distribution package creation failed: {e}")
+        utils.logger.error(f"ERROR: Distribution package creation failed: {e}")
         return False
 
 def clean_all():
     """Clean all build artifacts"""
-    utils.logger.info("🧹 Cleaning all build artifacts...")
+    utils.logger.info(">> Cleaning all build artifacts...")
 
     try:
         paths = utils.get_project_paths()
@@ -162,11 +162,11 @@ def clean_all():
         if paths['dist'].exists():
             utils.clean_directory(paths['dist'])
 
-        utils.logger.info("✅ All build artifacts cleaned")
+        utils.logger.info("SUCCESS: All build artifacts cleaned")
         return True
 
     except Exception as e:
-        utils.logger.error(f"❌ Clean failed: {e}")
+        utils.logger.error(f"ERROR: Clean failed: {e}")
         return False
 
 def main():
