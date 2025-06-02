@@ -13,7 +13,7 @@ from utils import utils
 
 def build_server(test: bool = False, package: bool = False):
     """Build server"""
-    utils.logger.info("🔨 Building server...")
+    utils.logger.info(">> Building server...")
 
     try:
         # Import and run server build
@@ -32,12 +32,12 @@ def build_server(test: bool = False, package: bool = False):
         return success
 
     except Exception as e:
-        utils.logger.error(f"❌ Server build failed: {e}")
+        utils.logger.error(f"ERROR: Server build failed: {e}")
         return False
 
 def build_client(target: str = 'all', test: bool = False, package: bool = False):
     """Build client"""
-    utils.logger.info("🔨 Building client...")
+    utils.logger.info(">> Building client...")
 
     try:
         # Import and run client build
@@ -62,7 +62,7 @@ def build_client(target: str = 'all', test: bool = False, package: bool = False)
         return success
 
     except Exception as e:
-        utils.logger.error(f"❌ Client build failed: {e}")
+        utils.logger.error(f"ERROR: Client build failed: {e}")
         return False
 
 def create_distribution_package():
@@ -201,7 +201,7 @@ Examples:
 
     # Print banner
     print("=" * 60)
-    print("🔨 Nyx App Build Orchestrator")
+    print(">> Nyx App Build Orchestrator")
     print("=" * 60)
 
     # Clean if requested
@@ -224,19 +224,19 @@ Examples:
 
     if success:
         print("\n" + "=" * 60)
-        print("✅ Build completed successfully!")
+        print("SUCCESS: Build completed successfully!")
         print("=" * 60)
 
         if args.distribute:
             dist_path = utils.get_project_paths()['dist']
-            print(f"\n📦 Distribution package ready: {dist_path}")
+            print(f"\nDISTRIBUTION: Package ready: {dist_path}")
         else:
-            print("\n📋 Next steps:")
+            print("\nNEXT STEPS:")
             print("1. Test the built applications")
             print("2. Create distribution: python deploy/build.py --distribute")
     else:
         print("\n" + "=" * 60)
-        print("❌ Build failed!")
+        print("ERROR: Build failed!")
         print("=" * 60)
 
     sys.exit(0 if success else 1)
