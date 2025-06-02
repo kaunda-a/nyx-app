@@ -40,8 +40,17 @@ def build_client(target: str = 'all', test: bool = False, package: bool = False)
     utils.logger.info(">> Building client...")
 
     try:
-        # Import and run client build
-        sys.path.insert(0, str(Path(__file__).parent / "scripts" / "client"))
+        # Import and run client build - clear any previous paths first
+        client_build_path = str(Path(__file__).parent / "scripts" / "client")
+        if client_build_path in sys.path:
+            sys.path.remove(client_build_path)
+        sys.path.insert(0, client_build_path)
+
+        # Clear any cached modules
+        import importlib
+        if 'build' in sys.modules:
+            importlib.reload(sys.modules['build'])
+
         from build import ClientBuilder
 
         builder = ClientBuilder()
