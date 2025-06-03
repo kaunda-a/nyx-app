@@ -55,23 +55,9 @@ class ClientBuilder:
             package_manager = self.config.get('package_manager', 'pnpm')
             build_command = self.build_config.get('command', 'tauri build')
 
-            # Generate custom icons first
-            self.logger.info(">> Generating custom icons...")
-            # Get project root from client path
-            project_root = client_path.parent
-            icon_script = project_root / 'deploy' / 'scripts' / 'client' / 'generate-icons.py'
-            if icon_script.exists():
-                result = subprocess.run([
-                    sys.executable, str(icon_script)
-                ], capture_output=True, text=True)
-
-                if result.returncode == 0:
-                    self.logger.info(">> Custom icons generated successfully")
-                else:
-                    self.logger.warning(f"Icon generation warning: {result.stderr}")
-            else:
-                self.logger.warning("Icon generation script not found")
-
+            # Icon files are committed to repository - no generation needed
+            self.logger.info(">> Using committed icon files...")
+            
             # Ensure production environment file exists
             env_file = client_path / self.build_config.get('env_file', '.env.production')
             if not env_file.exists():
