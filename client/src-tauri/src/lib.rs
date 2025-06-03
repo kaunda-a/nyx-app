@@ -78,21 +78,64 @@ async fn start_embedded_server(app_handle: tauri::AppHandle) -> Result<(), Strin
         return Err("Server executable not found in resources".to_string());
     }
 
-    // Start the server process
+    // Start the server process with better error handling
     match Command::new(&resource_path)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .spawn()
     {
-        Ok(_) => {
-            log::info!("Server started successfully");
-            Ok(())
+        Ok(mut child) => {
+            log::info!("Server process started, waiting for startup...");
+
+            // Give the server time to start
+            tokio::time::sleep(tokio::time::Duration::from_secs(3)).await;
+
+            // Check if the process is still running
+            match child.try_wait() {
+                Ok(Some(status)) => {
+                    log::error!("Server process exited early with status: {}", status);
+                    Err(format!("Server process exited early with status: {}", status))
+                }
+                Ok(None) => {
+                    log::info!("Server started successfully and is running");
+                    Ok(())
+                }
+                Err(e) => {
+                    log::error!("Error checking server process: {}", e);
+                    Err(format!("Error checking server process: {}", e))
+                }
+            }
         }
         Err(e) => {
             log::error!("Failed to start server: {}", e);
             Err(format!("Failed to start server: {}", e))
         }
     }
+}
+
+#[tauri::command]
+async fn wait_for_server_ready() -> Result<bool, String> {
+    log::info!("Waiting for server to be ready...");
+
+    // Try to connect to server for up to 30 seconds
+    for i in 0..30 {
+        match check_server_health().await {
+            Ok(true) => {
+                log::info!("Server is ready!");
+                return Ok(true);
+            }
+            Ok(false) => {
+                log::debug!("Server not ready yet, attempt {}/30", i + 1);
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            }
+            Err(e) => {
+                log::debug!("Server health check error: {}", e);
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+            }
+        }
+    }
+
+    Err("Server failed to start within 30 seconds".to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -102,7 +145,8 @@ pub fn run() {
         check_server_health,
         start_server,
         open_server_folder,
-        start_embedded_server
+        start_embedded_server,
+        wait_for_server_ready
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {

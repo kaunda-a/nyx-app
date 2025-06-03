@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <style>
+    path, circle { 
+      stroke: #6366F1; 
+      fill: none; 
+      stroke-width: 1.5;
+    }
+    circle.eye { 
+      fill: #6366F1; 
+    }
+  </style>
+  
+  <!-- Main body - hexagon -->
+  <path d="M12 4L18 8V16L12 20L6 16V8L12 4Z"/>
+  
+  <!-- Spider legs -->
+  <g>
+    <!-- Left legs -->
+    <path d="M6 12L3 9"/>
+    <path d="M6 12L2 12"/>
+    <path d="M6 12L3 15"/>
+    
+    <!-- Right legs -->
+    <path d="M18 12L21 9"/>
+    <path d="M18 12L22 12"/>
+    <path d="M18 12L21 15"/>
+  </g>
+  
+  <!-- Eyes -->
+  <circle cx="10" cy="12" r="1" class="eye"/>
+  <circle cx="14" cy="12" r="1" class="eye"/>
+</svg>

@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createRootRouteWithContext, Outlet, redirect, useNavigate } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/auth/api/stores/authStore'
@@ -8,6 +8,7 @@ import { createClient } from '@supabase/supabase-js'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { useLoading } from '@/provider/loading-context'
+import { ServerLoading } from '@/components/server-loading'
 
 // Inline supabase client to avoid import issues during build
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -65,6 +66,7 @@ function RootComponent() {
   const { user, setUser } = useAuthStore((state) => state.auth)
   const navigate = useNavigate()
   const { setIsLoading } = useLoading()
+  const [serverReady, setServerReady] = useState(false)
 
   useEffect(() => {
     const loadSession = async () => {
@@ -99,6 +101,11 @@ function RootComponent() {
 
     return () => subscription.unsubscribe()
   }, [navigate, setUser, setIsLoading])
+
+  // Show server loading screen if server isn't ready
+  if (!serverReady) {
+    return <ServerLoading onServerReady={() => setServerReady(true)} />
+  }
 
   return (
     <>
