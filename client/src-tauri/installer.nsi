@@ -27,15 +27,15 @@ RequestExecutionLevel admin
 ; Modern UI Configuration
 !define MUI_ABORTWARNING
 
-; Installer icons
-!define MUI_ICON "icons\icon.ico"
-!define MUI_UNICON "icons\icon.ico"
+; Installer icons - use Tauri's icon path variables
+!define MUI_ICON "{{icon_path}}"
+!define MUI_UNICON "{{icon_path}}"
 
-; Custom branding
-!define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "icons\installer-banner.bmp"
-!define MUI_HEADERIMAGE_RIGHT
-!define MUI_WELCOMEFINISHPAGE_BITMAP "icons\installer-banner.bmp"
+; Custom branding - disable custom bitmaps for now to avoid path issues
+; !define MUI_HEADERIMAGE
+; !define MUI_HEADERIMAGE_BITMAP "icons\installer-banner.bmp"
+; !define MUI_HEADERIMAGE_RIGHT
+; !define MUI_WELCOMEFINISHPAGE_BITMAP "icons\installer-banner.bmp"
 
 ; Custom installer appearance
 !define MUI_WELCOMEPAGE_TITLE_3LINES

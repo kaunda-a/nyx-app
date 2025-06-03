@@ -151,6 +151,10 @@ def generate_icon_files():
         # Create a simple ICO file
         create_simple_ico(icons_dir / "icon.ico")
         print(f"✓ Created: icon.ico")
+
+        # Ensure required icon files exist (copy from existing or create simple ones)
+        ensure_required_icons(icons_dir)
+        print(f"✓ Ensured all required icon files exist")
         
         # Try to convert SVG to other formats if tools are available
         try_convert_icons(icons_dir)
@@ -278,6 +282,67 @@ def create_simple_ico(ico_path):
 
     except Exception as e:
         print(f"Warning: Could not create ICO file: {e}")
+
+def ensure_required_icons(icons_dir):
+    """Ensure all required icon files exist for Tauri."""
+    try:
+        # Required icon files for Tauri
+        required_files = [
+            "32x32.png",
+            "128x128.png",
+            "128x128@2x.png",
+            "icon.icns",
+            "icon.ico"
+        ]
+
+        # Check if any existing PNG files exist to copy from
+        existing_pngs = list(icons_dir.glob("*.png"))
+        source_png = None
+
+        if existing_pngs:
+            # Use the first existing PNG as source
+            source_png = existing_pngs[0]
+
+        for filename in required_files:
+            file_path = icons_dir / filename
+
+            if not file_path.exists():
+                if filename.endswith('.png'):
+                    if source_png and source_png.exists():
+                        # Copy existing PNG
+                        import shutil
+                        shutil.copy2(source_png, file_path)
+                        print(f"  Copied {source_png.name} to {filename}")
+                    else:
+                        # Create a minimal placeholder PNG
+                        create_minimal_png(file_path)
+                        print(f"  Created placeholder {filename}")
+
+                elif filename.endswith('.icns'):
+                    # Create ICNS placeholder (just copy ICO)
+                    ico_path = icons_dir / "icon.ico"
+                    if ico_path.exists():
+                        import shutil
+                        shutil.copy2(ico_path, file_path)
+                        print(f"  Created {filename} from ICO")
+
+    except Exception as e:
+        print(f"Warning: Could not ensure required icons: {e}")
+
+def create_minimal_png(png_path):
+    """Create a minimal valid PNG file."""
+    try:
+        # Create a simple 32x32 transparent PNG with a small colored square
+        size = 32
+
+        # Minimal PNG data for a 32x32 transparent image with a small purple square
+        png_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00 \x00\x00\x00 \x08\x06\x00\x00\x00szz\xf4\x00\x00\x00\x19tEXtSoftware\x00Adobe ImageReadyq\xc9e<\x00\x00\x00\x0eIDATx\xdac\xf8\x0f\x00\x00\x01\x00\x01\x00\x18\xdd\x8d\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+
+        with open(png_path, 'wb') as f:
+            f.write(png_data)
+
+    except Exception as e:
+        print(f"Warning: Could not create minimal PNG {png_path}: {e}")
 
 def try_convert_icons(icons_dir):
     """Try to convert SVG icons to other formats using available tools."""

@@ -33,7 +33,11 @@
     "active": true,
     "targets": ["nsis"],
     "icon": [
-      "icons/icon.svg"
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ],
     "publisher": "Nyx",
     "category": "Productivity",
@@ -54,8 +58,7 @@
         "displayLanguageSelector": false,
         "installerIcon": "icons/icon.ico",
         "installMode": "perMachine",
-        "languages": ["English"],
-        "template": "installer.nsi"
+        "languages": ["English"]
       }
     },
     "macOS": {
