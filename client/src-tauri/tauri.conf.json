@@ -49,6 +49,13 @@
       "wix": {
         "language": "en-US",
         "template": "main.wxs"
+      },
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "installMode": "perMachine",
+        "languages": ["English"],
+        "template": "installer.nsi"
       }
     },
     "macOS": {

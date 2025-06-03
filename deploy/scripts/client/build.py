@@ -3,6 +3,7 @@ Client build automation
 """
 
 import sys
+import subprocess
 from pathlib import Path
 import glob
 
@@ -53,6 +54,21 @@ class ClientBuilder:
             client_path = self.paths['client']
             package_manager = self.config.get('package_manager', 'pnpm')
             build_command = self.build_config.get('command', 'tauri build')
+
+            # Generate custom icons first
+            self.logger.info(">> Generating custom icons...")
+            icon_script = self.paths['project'] / 'deploy' / 'scripts' / 'client' / 'generate-icons.py'
+            if icon_script.exists():
+                result = subprocess.run([
+                    sys.executable, str(icon_script)
+                ], capture_output=True, text=True)
+
+                if result.returncode == 0:
+                    self.logger.info(">> Custom icons generated successfully")
+                else:
+                    self.logger.warning(f"Icon generation warning: {result.stderr}")
+            else:
+                self.logger.warning("Icon generation script not found")
 
             # Ensure production environment file exists
             env_file = client_path / self.build_config.get('env_file', '.env.production')
