@@ -57,7 +57,9 @@ class ClientBuilder:
 
             # Generate custom icons first
             self.logger.info(">> Generating custom icons...")
-            icon_script = self.paths['project'] / 'deploy' / 'scripts' / 'client' / 'generate-icons.py'
+            # Get project root from client path
+            project_root = client_path.parent
+            icon_script = project_root / 'deploy' / 'scripts' / 'client' / 'generate-icons.py'
             if icon_script.exists():
                 result = subprocess.run([
                     sys.executable, str(icon_script)
