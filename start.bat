@@ -99,7 +99,7 @@ echo.
 echo This will:
 echo 1. Push your code to GitHub
 echo 2. Automatically build and package everything in the cloud
-echo 3. Create a ready-to-install Nyx.msi file
+echo 3. Create a ready-to-install Nyx.exe file
 echo.
 set /p confirm="Continue with deployment? (y/N): "
 if /i not "%confirm%"=="y" (
@@ -132,7 +132,7 @@ echo.
 echo What to do next:
 echo 1. Visit: https://github.com/kaunda-a/nyx-app/actions
 echo 2. Wait for build to complete (~10-15 minutes)
-echo 3. Download Nyx.msi from the artifacts
+echo 3. Download Nyx.exe from the artifacts
 echo.
 goto success_exit
 
