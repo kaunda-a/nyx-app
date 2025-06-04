@@ -55,6 +55,18 @@ class ClientBuilder:
             package_manager = self.config.get('package_manager', 'pnpm')
             build_command = self.build_config.get('command', 'tauri build')
 
+            self.logger.info(">> Copying server executable for embedding...")
+            server_exe = client_path.parent / 'server' / 'dist' / 'nyx-server.exe'
+            tauri_server_path = client_path / 'src-tauri' / 'nyx-server.exe'
+            
+            if server_exe.exists():
+                import shutil
+                shutil.copy2(server_exe, tauri_server_path)
+                size_mb = server_exe.stat().st_size / (1024 * 1024)
+                self.logger.info(f">> Copied server executable: {size_mb:.1f} MB")
+            else:
+                self.logger.warning(">> Server executable not found for embedding")
+
             # Icon files are committed to repository - no generation needed
             self.logger.info(">> Using committed icon files...")
             

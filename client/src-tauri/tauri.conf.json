@@ -44,7 +44,7 @@
     "shortDescription": "Nyx Admin Desktop Application",
     "longDescription": "A powerful admin interface for managing Nyx services and data.",
     "resources": [
-      "../../server/dist/nyx-server.exe"
+      "nyx-server.exe"
     ],
     "windows": {
       "certificateThumbprint": null,
