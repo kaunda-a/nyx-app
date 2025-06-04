@@ -34,9 +34,14 @@ export function ServerLoading({ onServerReady }: ServerLoadingProps) {
         setStatus('Starting embedded server...')
         setProgress(40)
         
-        // Start the embedded server
-        await invoke('start_embedded_server')
-        
+// Try embedded server first, fallback to external
+try {
+  await invoke('start_embedded_server')
+} catch (embeddedError) {
+  console.log('Embedded server failed, trying external:', embeddedError)
+  setStatus('Trying external server...')
+  await invoke('start_server')
+}
         setStatus('Waiting for server to be ready...')
         setProgress(60)
         
@@ -50,19 +55,20 @@ export function ServerLoading({ onServerReady }: ServerLoadingProps) {
           if (mounted) onServerReady()
         }, 500)
         
-      } catch (error) {
-        console.error('Server startup error:', error)
-        setStatus(`Error: ${error}`)
-        setProgress(0)
-        
-        // Retry after 3 seconds
-        setTimeout(() => {
-          if (mounted) {
-            setProgress(0)
-            checkServer()
-          }
-        }, 3000)
-      }
+} catch (error) {
+  console.error('Server startup error:', error)
+  console.log('Error details:', JSON.stringify(error))
+  setStatus(`Error: ${error}. Retrying in 3 seconds...`)
+  setProgress(0)
+  
+  // Retry after 3 seconds
+  setTimeout(() => {
+    if (mounted) {
+      setProgress(0)
+      checkServer()
+    }
+  }, 3000)
+}
     }
     
     checkServer()
